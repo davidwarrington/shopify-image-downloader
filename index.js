@@ -10,6 +10,7 @@ import path from 'node:path';
  * @property {string} input
  * @property {string} output
  * @property {string} [cdn]
+ * @property {boolean} [list]
  */
 
 /**
@@ -20,16 +21,20 @@ function parseArgs(args) {
   const options = {
     input: '.',
     output: '.',
+    list: false,
   };
 
   const flagToOptionMap = {
     '--in': 'input',
     '--out': 'output',
     '--cdn': 'cdn',
+    '--list': 'list',
   };
 
   args.forEach(arg => {
-    if (!arg.includes('=')) {
+    const isValidFlag = Object.keys(flagToOptionMap).some(key => arg.startsWith(key));
+
+    if (!isValidFlag) {
       return;
     }
 
@@ -41,7 +46,7 @@ function parseArgs(args) {
       return;
     }
 
-    options[optionKey] = value;
+    options[optionKey] = value !== '' ? value : true;
   });
 
   return options;
@@ -163,7 +168,7 @@ function getUrlsFromProject(root, cdnPath) {
 }
 
 (async () => {
-  const { input, output, cdn } = parseArgs(process.argv.slice(2));
+  const { input, output, cdn, list } = parseArgs(process.argv.slice(2));
 
   const inputIsDirectory = isDirectory(input);
   const cdnIsRequired = inputIsDirectory;
@@ -177,6 +182,10 @@ function getUrlsFromProject(root, cdnPath) {
     : await getUrlsFromFile(input);
 
   urls = deduplicate(urls);
+
+  if (list) {
+
+  }
 
   ensureDir(output);
 
