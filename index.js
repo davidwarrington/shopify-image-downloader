@@ -12,6 +12,41 @@ import path from 'node:path';
  * @property {string} [cdn]
  */
 
+/**
+ * @param {string[]} args
+ * @returns {Argv}
+ */
+function parseArgs(args) {
+  const options = {
+    input: '.',
+    output: '.',
+  };
+
+  const flagToOptionMap = {
+    '--in': 'input',
+    '--out': 'output',
+    '--cdn': 'cdn',
+  };
+
+  args.forEach(arg => {
+    if (!arg.includes('=')) {
+      return;
+    }
+
+    const [flag, value] = arg.split('=');
+
+    const optionKey = flagToOptionMap[flag];
+
+    if (!optionKey) {
+      return;
+    }
+
+    options[optionKey] = value;
+  });
+
+  return options;
+}
+
 /** @param {string} path */
 function ensureDir(path) {
   if (!fs.existsSync(path)) {
@@ -128,47 +163,27 @@ function getUrlsFromProject(root, cdnPath) {
 }
 
 (async () => {
-  const args = process.argv.slice(2);
+  const { input, output, cdn } = parseArgs(process.argv.slice(2));
 
-  /** @type {Argv} */
-  const argv = args.reduce(
-    (accumulator, arg) => {
-      if (!arg.includes('=')) {
-        return accumulator;
-      }
+  const inputIsDirectory = isDirectory(input);
 
-      const [flag, value] = arg.split('=');
-
-      if (flag === '--in') {
-        accumulator.input = value;
-      } else if (flag === '--out') {
-        accumulator.output = value;
-      } else if (flag === '--cdn') {
-        accumulator.cdn = value;
-      }
-
-      return accumulator;
-    },
-    { input: '.', output: '.', cdn: undefined }
-  );
-
-  if (!argv.cdn) {
+  if (!cdn) {
     throw new Error(`--cdn is required.`);
   }
 
   let urls = inputIsDirectory
-    ? getUrlsFromProject(argv.input, argv.cdn)
-    : await getUrlsFromFile(argv.input);
+    ? getUrlsFromProject(input, cdn)
+    : await getUrlsFromFile(input);
 
   urls = deduplicate(urls);
 
-  ensureDir(argv.output);
+  ensureDir(output);
 
   console.log(`Found ${urls.length} files. Downloading...`);
 
   urls.forEach((url) => {
     const filename = path.basename(url);
-    const stream = fs.createWriteStream(path.join(argv.output, filename));
+    const stream = fs.createWriteStream(path.join(output, filename));
     https.get(url, (response) => {
       response.pipe(stream);
     });
