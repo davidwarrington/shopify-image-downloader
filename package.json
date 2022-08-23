@@ -1,11 +1,11 @@
 {
-  "name": "download-shopify-images",
+  "name": "shopify-image-downloader",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "download-shopify-images": "index.js"
+    "shopify-image-downloader": "index.js"
   },
   "scripts": {},
   "keywords": [],
