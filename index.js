@@ -166,8 +166,9 @@ function getUrlsFromProject(root, cdnPath) {
   const { input, output, cdn } = parseArgs(process.argv.slice(2));
 
   const inputIsDirectory = isDirectory(input);
+  const cdnIsRequired = inputIsDirectory;
 
-  if (!cdn) {
+  if (cdnIsRequired && !cdn) {
     throw new Error(`--cdn is required.`);
   }
 
