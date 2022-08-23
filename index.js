@@ -100,7 +100,7 @@ function getUrlsFromProject(root, cdnPath) {
   const dataFiles = directories.flatMap(getJSONFilesFromDirectory);
 
   dataFiles.forEach((file) => {
-    const data = fs.readFileSync(path.join(root, file), { encoding: 'utf-8' });
+    const data = fs.readFileSync(file, { encoding: 'utf-8' });
 
     try {
       JSON.parse(data, (_, value) => {
