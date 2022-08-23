@@ -11,7 +11,8 @@
 ## Options
 
 ### CDN Path, `---cdn`
-Required
+Required if input is a directory.
+
 Default Value: `undefined`
 
 This path will be prepended to all Shopify image URLs in order to download them. To get the CDN path visit your live store, open an image in a new tab and copy everything before the filename in the URL.
