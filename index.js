@@ -50,7 +50,7 @@ function deduplicate(list) {
 
 /** @param {string} input */
 function getUrlsFromFile(input) {
-  return readFile(input).then(trim).then(splitByNewline).then(deduplicate);
+  return readFile(input).then(trim).then(splitByNewline);
 }
 
 /** @param {unknown} value */
@@ -156,11 +156,11 @@ function getUrlsFromProject(root, cdnPath) {
     throw new Error(`--cdn is required.`);
   }
 
-  const inputIsDirectory = isDirectory(argv.input);
-
-  const urls = inputIsDirectory
+  let urls = inputIsDirectory
     ? getUrlsFromProject(argv.input, argv.cdn)
     : await getUrlsFromFile(argv.input);
+
+  urls = deduplicate(urls);
 
   ensureDir(argv.output);
 
